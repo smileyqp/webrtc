@@ -39,8 +39,13 @@ if( !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia ){
     console.log('getUserMedia is not support!')
 }else{
     var constraints = {
-        video : true,
-        audio : true
+        video : {
+            width:640,
+            height:480,
+            frameRate:30,    //帧率
+            //facingMode摄像头的q前置还是后置的设置
+        },
+        audio : false
     }
     navigator.mediaDevices.getUserMedia(constraints)
     .then(gotMediaStream)   //获取流
