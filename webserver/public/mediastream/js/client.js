@@ -35,22 +35,32 @@ function handleError (err){
     console.log(err);
 }
 
-if( !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia ){
-    console.log('getUserMedia is not support!')
-}else{
-    var constraints = {
-        video : {
-            width:640,
-            height:480,
-            frameRate:30,    //帧率
-            //facingMode摄像头的q前置还是后置的设置
-        },
-        audio : false
+function start(){
+    if( !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia ){
+        console.log('getUserMedia is not support!');
+        return;
+    }else{
+        var deviceId = videoSource.value;   //获取设备ID；用于当设备选择改变的时候改变设备
+        var constraints = {
+            video : {
+                width:640,
+                height:480,
+                frameRate:30,    //帧率
+                facingMode:'enviroment',    //facingMode摄像头的q前置还是后置的设置
+                deviceId:deviceId ? deviceId :undefined
+            },
+            audio : {
+                noiseSupression:true,   //降噪
+                echoCancellation:true,  //回音消除设置成true
+            },
+            
+        }
+        navigator.mediaDevices.getUserMedia(constraints)
+        .then(gotMediaStream)   //获取流
+        .then(gotDevices)       //设备获取处理
+        .catch(handleError);
     }
-    navigator.mediaDevices.getUserMedia(constraints)
-    .then(gotMediaStream)   //获取流
-    .then(gotDevices)       //设备获取处理
-    .catch(handleError);
 }
-
+start();
+videoSource.onchange = start;   //在视频攒则改变的时候，即onchange时候重新调用start函数;实现设备的切换
 
