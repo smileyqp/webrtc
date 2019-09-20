@@ -7,6 +7,9 @@ var videoplay = document.querySelector('video#player')
 var audioSource = document.querySelector("select#audioSource");
 var audioOutput = document.querySelector("select#audioOutput");
 var videoSource = document.querySelector("select#videoSource");
+
+var filtersSelect = document.querySelector("select#filter");
+
 function gotDevices(deviceInfos) {      //参数deviceInfos是设备信息的数组
     deviceInfos.forEach((deviceInfo) => {
         console.log(deviceInfo.kind + ':label = ' + deviceInfo.label + ':id = ' + deviceInfo.deviceId + ':groupId = ' + deviceInfo.groupId);
@@ -62,5 +65,8 @@ function start(){
     }
 }
 start();
-videoSource.onchange = start;   //在视频攒则改变的时候，即onchange时候重新调用start函数;实现设备的切换
+videoSource.onchange = start;       //在视频攒则改变的时候，即onchange时候重新调用start函数;实现设备的切换
 
+filtersSelect.onchange = function(){        //视频特效
+    videoplay.className = filtersSelect.value;
+}
