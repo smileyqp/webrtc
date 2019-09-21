@@ -10,6 +10,12 @@ var videoSource = document.querySelector("select#videoSource");
 
 var filtersSelect = document.querySelector("select#filter");
 
+var snapshot = document.querySelector("button#snapshot");
+var picture = document.querySelector("canvas#picture");
+picture.width = 320;
+picture.height = 240;
+
+
 function gotDevices(deviceInfos) {      //参数deviceInfos是设备信息的数组
     deviceInfos.forEach((deviceInfo) => {
         console.log(deviceInfo.kind + ':label = ' + deviceInfo.label + ':id = ' + deviceInfo.deviceId + ':groupId = ' + deviceInfo.groupId);
@@ -68,5 +74,13 @@ start();
 videoSource.onchange = start;       //在视频攒则改变的时候，即onchange时候重新调用start函数;实现设备的切换
 
 filtersSelect.onchange = function(){        //视频特效
-    videoplay.className = filtersSelect.value;
+    videoplay.className = filtersSelect.value;      //设置视频的className方便加滤镜
+}
+
+snapshot.onclick = function(){
+    picture.className = filtersSelect.value;    //设置滤镜
+    picture.getContext('2d').drawImage(videoplay,   //数据源
+                                        0,0,            //开始和结束位置
+                                        picture.width,      //画布宽
+                                        picture.height)     //画布高
 }
