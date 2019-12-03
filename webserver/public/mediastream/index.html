@@ -47,8 +47,24 @@
         </select>
     </div>
     
-
-    <video autoplay playsinline id = 'player'></video>
+    <!-- <audio autoplay id = 'audioplayer' controls></audio> -->
+    <tr>
+        <td>
+            <video autoplay playsinline id = 'player'></video>
+        </td>
+        <td>
+            <div id="constraints"></div>
+        </td>
+        <td>
+            <video playsinline id = 'recplayer'></video>
+        </td>
+    </tr>
+    <tr>
+        <td><button id="record">Start Record</button></td>
+        <td><button id="recplay" disabled>Play</button></td>
+        <td><button id="download" disabled>Download</button></td>
+    </tr>
+    
 
     <div>
         <button id='snapshot'>take snapShot</button>

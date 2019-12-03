@@ -16,6 +16,17 @@ picture.width = 320;
 picture.height = 240;
 
 
+var divConstraints = document.querySelector('div#constraints');
+
+//record
+var recvideo = document.querySelector('video#recplayer');
+var btnRecord = document.querySelector('button#record');
+var btnPlay = document.querySelector('button#recplay');
+var btnDownload = document.querySelector('button#download');
+
+var buffer;//定義一個二進制數組存儲採集的數據
+var mediaRecorder;
+
 function gotDevices(deviceInfos) {      //参数deviceInfos是设备信息的数组
     deviceInfos.forEach((deviceInfo) => {
         console.log(deviceInfo.kind + ':label = ' + deviceInfo.label + ':id = ' + deviceInfo.deviceId + ':groupId = ' + deviceInfo.groupId);
@@ -35,7 +46,16 @@ function gotDevices(deviceInfos) {      //参数deviceInfos是设备信息的数
 
 //获取到流
 function gotMediaStream (stream){
+    
+
+    var videoTrack = stream.getVideoTracks()[0];//獲取視頻track；这里取第一個
+    var videoConstraints =  videoTrack.getSettings();//這裏拿到video所有的約束
+    
+    divConstraints.textContent = JSON.stringify(videoConstraints,null,2)//轉成JSON，第一個參數是約束，第二個參數null，第三個參數是縮進的空格
+
+    window.stream = stream;//挂载到全局；方便调用
     videoplay.srcObject = stream;
+
     return navigator.mediaDevices.enumerateDevices();   //成功获取流；并返回一个promise；用于后边对设备的判断
 }
 
@@ -71,7 +91,7 @@ function start(){
     }
 }
 start();
-videoSource.onchange = start;       //在视频攒则改变的时候，即onchange时候重新调用start函数;实现设备的切换
+videoSource.onchange = start;       //在视频規則改变的时候，即onchange时候重新调用start函数;实现设备的切换
 
 filtersSelect.onchange = function(){        //视频特效
     videoplay.className = filtersSelect.value;      //设置视频的className方便加滤镜
@@ -83,4 +103,68 @@ snapshot.onclick = function(){
                                         0,0,            //开始和结束位置
                                         picture.width,      //画布宽
                                         picture.height)     //画布高
+}
+
+
+
+btnRecord.onclick = () => {
+    if(btnRecord.textContent === 'Start Record'){
+        startRecord();
+        btnRecord.textContent = 'Stop Record';
+        btnPlay.disabled = true;
+        btnDownload.disabled = true;
+    }else{
+        stopRecord();
+        btnRecord.textContent = 'Start Record';
+        btnPlay.disabled = false;
+        btnDownload.disabled = false;
+    }
+}
+
+
+function handleDataAvailable(e){
+    if(e && e.data && e.data.size>0){
+        buffer.push(e.data)
+    }
+}
+function startRecord(){
+    buffer = [];//定義buffer爲一個數組
+    var options = {
+        mimType:'video/webm;codecs=vp8'//音頻視頻同時有的時候是video只有音頻的時候是audio
+    } 
+    if(!MediaRecorder.isTypeSupported(options.mimType)){//這裏進行檢驗這個mimType是否支持
+        console.error(`${options.mimType} is not supported!`)
+        return;
+    }
+    try{
+        mediaRecorder = new MediaRecorder(window.stream,options);
+    }catch(e){
+        console.log('Failed to create MediaRecorder,e')
+        return;
+    }
+    mediaRecorder.ondataavailable = handleDataAvailable;//數據有效時候的處理
+    mediaRecorder.start(10);//傳入時間片，每隔這個時間片存儲一次數據
+}
+function stopRecord(){
+    mediaRecorder.stop();
+}
+
+btnPlay.onclick = () => {
+    var blob = new Blob(buffer,{type:'video/webm'});//生成一個blob可以處理buffer的對象；buffer就是剛剛錄製的一個數據
+    recvideo.src = window.URL.createObjectURL(blob);//注意srcObject是獲取直播流的時候用的
+    recvideo.srcObject = null;
+    recvideo.controls = true;//控制播放
+    recvideo.play();//獲取流之後調用play播放video
+}
+
+
+btnDownload.onclick = () => {
+    var blob = new Blob(buffer,{type:'video/webm'});
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+
+    a.href = url;
+    a.style.display = 'none';
+    a.download = 'aaa.webm';
+    a.click();
 }
