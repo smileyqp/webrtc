@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>webrtc PeerConnection</title>
+</head>
+<body>
+    <div>
+        <h2>Local:</h2>
+        <video id = 'localvideo' autoplay playsinline></video>
+
+        <h2>Offer SDP:</h2>
+        <textarea id="offer"></textarea>
+
+        <h2>Remote:</h2>
+        <video id = 'remotevideo' autoplay playsinline></video>
+
+        <h2>answer SDP:</h2>
+        <textarea id="answer"></textarea>
+       
+        <div>
+            <button id = "start">start</button>
+            <button id = "call">Call</button>
+            <button id = "hangup">Hang Up</button>
+        </div>
+    </div>
+    <script src="./lib/adapter-latest.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
